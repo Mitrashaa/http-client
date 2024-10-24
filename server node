@@ -1,0 +1,102 @@
+const http = reqtuire("http");
+const fs = require("fs");
+ 
+// данныe
+const content = [
+    { id:1, name:"movie"}, 
+    { id:2, name:"music"},
+    { id:3, name:"cartoons"}
+]
+
+function getReqData(req) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const buffers = [];
+            for await (const chunk of req) {
+                buffers.push(chunk);
+            }
+            const data = JSON.parse(Buffer.concat(buffers).toString());
+            resolve(data);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+ 
+http.createServer(async (request, response) => {
+      
+     // получение контента
+     if (request.url === "/api/content" && request.method === "GET") {
+        response.end(JSON.stringify(content));
+    }
+    // получение одного наименования по id
+     else if (request.url.match(/\/api\/content\/([0-9]+)/) && request.method === "GET") {
+        // получаем id из адреса
+        const id = request.url.split("/")[3];
+        // получаем pyfxtybbt по id
+        const user = content.find((c) => c.id === parseInt(id));
+        // если найденo, отправляем его
+        if(content) 
+            response.end(JSON.stringify(user));
+        // если не найденo
+            response.writeHead(404, { "Content-Type": "application/json" });
+            response.end(JSON.stringify({ message: "контент не найден" }));
+        }
+    }
+    // удаление по id  
+    else if (request.url.match(/\/api\/content\/([0-9]+)/) && request.method === "DELETE") {
+        // получаем id 
+        const id = request.url.split("/")[3];
+        const contentIndex = content.findIndex((c) => c.id === parseInt(id));
+        if(contentIndex > -1) {
+            const content = content.splice(contentIndex, 1)[0];
+            response.end(JSON.stringify(content));
+        }
+        // если не найденo
+        else{
+            response.writeHead(404, { "Content-Type": "application/json" });
+            response.end(JSON.stringify({ message: "контент не найден" }));
+        }
+    }
+    // добавить что то
+    else if (request.url === "/api/content" && request.method === "POST") {
+        try
+            const contentData = await getReqData(request)
+            const content = {name: contentData.name};
+            const id = Math.max.apply(Math,content.map(function(u){return c.id;}))
+            content.id = id + 1;
+            content.push(content);
+            response.end(JSON.stringify(content));
+        }
+        catch(error){
+            response.writeHead(400, { "Content-Type": "application/json" });
+            response.end(JSON.stringify({ message: "Некорректный запрос" }));
+        }
+    }
+    // измененить
+    else if (request.url === "/api/content" && request.method === "PUT") {
+        try{
+            const contentData = await getReqData(request);
+            const content = content.find((c) => c.id === parseInt(contentData.id));
+            if(content) {
+                content.name = contentData.name;
+                response.end(JSON.stringify(content));
+            }
+            else{
+                response.writeHead(404, { "Content-Type": "application/json" });
+                response.end(JSON.stringify({ message: "контент не найден" }));
+            }
+        }
+        catch(error){
+            response.writeHead(400, { "Content-Type": "application/json" });
+            response.end(JSON.stringify({ message: "Некорректный запрос" }));
+        }
+    }
+    else if (request.url === "/" || request.url === "/index.html") {
+        fs.readFile("index.html", (error, data) => response.end(data));
+    }
+    else{
+        response.writeHead(404, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({ message: "Ресурс не найден" }));
+    }
+}).listen(2000, ()=>console.log("Сервер запущен по адресу http://localhost:2000"));
