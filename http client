@@ -1,1 +1,21 @@
-
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Mitrasha.ru</title>
+    <style>
+    tr{height:30px;}
+    td, th {min-width: 40px;text-align: left;}
+    a {cursor:pointer; padding:5px;text-decoration: underline;color:navy;}
+    input{width:180px;}
+    </style>
+</head>
+<body>
+    <h2>Список</h2>
+    <form name="contentForm">
+        <p>
+            <label for="name">название:</label><br>
+            <input name="name" />
+        </p>
+        <p>
